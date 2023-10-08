@@ -14,7 +14,7 @@ public class Todo {
     private String status;
     private Date addedDate;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy") //expected date format
     private Date todoDate;
 
 

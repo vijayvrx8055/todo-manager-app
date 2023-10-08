@@ -5,9 +5,9 @@ import com.vrx.todo.model.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class TodoServiceImpl implements TodoService {
@@ -17,8 +17,11 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo createTodo(Todo todo) {
+        todo.setId(new Random().nextInt(9999));
         todo.setAddedDate(new Date());
-        return jdbcDao.saveTodo(todo);
+        Todo response = jdbcDao.saveTodo(todo);
+        return response;
+
     }
 
     @Override
@@ -32,7 +35,10 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public Todo updateTodo(Todo todo) {
+    public Todo updateTodo(Todo todo, int id) {
+        if (id != todo.getId()) {
+            return null;
+        }
         return jdbcDao.updateTodo(todo);
     }
 

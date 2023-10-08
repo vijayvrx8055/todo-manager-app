@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TodoJdbcDaoImpl implements TodoJdbcDao {
@@ -47,6 +48,7 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
                 todo.getId(), todo.getTitle(),
                 todo.getContent(), todo.getStatus(),
                 todo.getAddedDate(), todo.getTodoDate());
+        logger.info("Todo Created.");
         logger.info("Todo added rows: {}", rows);
         return todo;
     }
@@ -60,9 +62,10 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
 
     @Override
     public List<Todo> getAllTodos() {
-        List<Todo> todos = template.queryForList(GET_ALL_TODOS_QUERY, Todo.class);
+        List<Map<String, Object>> todos = null;
+//        todos = template.queryForStream(GET_ALL_TODOS_QUERY,todos);
         logger.info("getAllTodos(): {}", todos);
-        return todos;
+        return null;
     }
 
     @Override
