@@ -2,6 +2,7 @@ package com.vrx.todo.dao;
 
 import com.vrx.todo.model.Todo;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface TodoJdbcDao {
@@ -10,7 +11,7 @@ public interface TodoJdbcDao {
     public Todo saveTodo(Todo todo);
 
     //get single todo from database
-    public Todo getTodo(int id);
+    public Todo getTodo(int id) throws ParseException;
 
     //get all todo from database
     public List<Todo> getAllTodos();
