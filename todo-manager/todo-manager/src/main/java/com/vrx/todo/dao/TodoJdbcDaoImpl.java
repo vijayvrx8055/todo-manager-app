@@ -6,22 +6,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoJdbcDaoImpl implements TodoJdbcDao {
 
     Logger logger = LoggerFactory.getLogger(TodoJdbcDaoImpl.class);
-
-    //    @Autowired
+    
     private JdbcTemplate template;
-
 
     public JdbcTemplate getTemplate() {
         return template;
@@ -73,9 +71,23 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
     @Override
     public List<Todo> getAllTodos() {
         List<Map<String, Object>> todos = null;
-//        todos = template.queryForObject(GET_ALL_TODOS_QUERY,todos);
+        todos = template.queryForList(GET_ALL_TODOS_QUERY);
+        List<Todo> todosList = todos.stream().map(t -> {
+            Todo todo = new Todo();
+            todo.setId((int) t.get("id"));
+            todo.setTitle((String) t.get("title"));
+            todo.setContent((String) t.get("content"));
+            todo.setStatus((String) t.get("status"));
+            try {
+                todo.setAddedDate(TodoHelper.parseDate((LocalDateTime) t.get("addedDate")));
+                todo.setTodoDate(TodoHelper.parseDate((LocalDateTime) t.get("todoDate")));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            return todo;
+        }).collect(Collectors.toList());
         logger.info("getAllTodos(): {}", todos);
-        return null;
+        return todosList;
     }
 
     @Override
