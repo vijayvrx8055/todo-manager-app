@@ -17,7 +17,7 @@ public interface TodoJdbcDao {
     public List<Todo> getAllTodos();
 
     //update todo in database
-    public Todo updateTodo(Todo todo);
+    public Todo updateTodo(Todo todo, int id);
 
     //delete todo from database
     public String deleteTodo(int id);

@@ -2,6 +2,8 @@ package com.vrx.todo.service;
 
 import com.vrx.todo.dao.TodoJdbcDao;
 import com.vrx.todo.model.Todo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ public class TodoServiceImpl implements TodoService {
 
     @Autowired
     private TodoJdbcDao jdbcDao;
+
+    Logger logger = LoggerFactory.getLogger(TodoServiceImpl.class);
 
     @Override
     public Todo createTodo(Todo todo) {
@@ -40,10 +44,7 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Todo updateTodo(Todo todo, int id) {
-        if (id != todo.getId()) {
-            return null;
-        }
-        return jdbcDao.updateTodo(todo);
+        return jdbcDao.updateTodo(todo, id);
     }
 
     @Override

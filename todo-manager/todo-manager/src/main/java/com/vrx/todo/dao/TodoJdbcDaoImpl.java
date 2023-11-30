@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +21,7 @@ import java.util.stream.Collectors;
 public class TodoJdbcDaoImpl implements TodoJdbcDao {
 
     Logger logger = LoggerFactory.getLogger(TodoJdbcDaoImpl.class);
-    
+
     private JdbcTemplate template;
 
     public JdbcTemplate getTemplate() {
@@ -91,11 +94,14 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
     }
 
     @Override
-    public Todo updateTodo(Todo todo) {
-        int rows = template.update(UPDATE_TODO_QUERY, todo.getTitle(), todo.getContent(), todo.getStatus(), todo.getAddedDate(), todo.getTodoDate());
+    public Todo updateTodo(Todo todo, int id) {
+        Date date = TodoHelper.getCurrentDate();
+        int rows = template.update(UPDATE_TODO_QUERY, todo.getTitle(), todo.getContent(), todo.getStatus(), date, todo.getTodoDate(), id);
         if (rows > 0) {
-            logger.info("Todo updated successfully..");
+            logger.info("Todo updated successfully!! recordCount: {}", rows);
         }
+        todo.setId(id);
+        todo.setAddedDate(date);
         return todo;
     }
 

@@ -15,4 +15,13 @@ public class TodoHelper {
         Instant instant = dateStr.atZone(ZoneId.systemDefault()).toInstant();
         return Date.from(instant);
     }
+
+    public static String dateToString(Date date){
+        System.out.println(date);
+        return date.toString();
+    }
+
+    public static java.sql.Date getCurrentDate() {
+       return new java.sql.Date(System.currentTimeMillis());
+        }
 }
