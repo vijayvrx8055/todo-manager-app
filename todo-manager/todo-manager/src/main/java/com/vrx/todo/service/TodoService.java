@@ -14,4 +14,6 @@ public interface TodoService {
     Todo updateTodo(Todo todo, int id);
 
     String deleteTodo(int id);
+
+    String deleteMultipleTodos(Integer[] todoIds);
 }

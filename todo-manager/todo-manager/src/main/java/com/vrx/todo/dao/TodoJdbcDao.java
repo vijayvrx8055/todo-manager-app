@@ -21,4 +21,6 @@ public interface TodoJdbcDao {
 
     //delete todo from database
     public String deleteTodo(int id);
+
+    String deleteMultipleTodos(Integer[] todoIds);
 }

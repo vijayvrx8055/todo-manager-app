@@ -54,4 +54,10 @@ public class TodoController {
         String status = todoService.deleteTodo(id);
         return ResponseEntity.status(HttpStatus.OK).body(status);
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteMultipleTodos(@RequestBody Integer[] todoIds){
+        String status = todoService.deleteMultipleTodos(todoIds);
+        return ResponseEntity.status(HttpStatus.OK).body(status);
+    }
 }

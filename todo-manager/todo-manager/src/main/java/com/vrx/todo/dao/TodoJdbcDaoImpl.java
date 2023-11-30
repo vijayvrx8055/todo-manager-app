@@ -5,13 +5,14 @@ import com.vrx.todo.model.Todo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +108,27 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
 
     @Override
     public String deleteTodo(int id) {
-        int rows = template.update(DELETE_TODO, Todo.class, id);
+        int rows = template.update(DELETE_TODO, id);
         return (rows > 0) ? "Todo Deleted Successfully...." : "ERROR in Deleting";
+    }
+
+    @Override
+    public String deleteMultipleTodos(Integer[] todoIds) {
+        int[] ints = template.batchUpdate(DELETE_TODO, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                int id = todoIds[i];
+                ps.setInt(1, id);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return todoIds.length;
+            }
+        });
+        for (int id : ints) {
+            logger.info("Deleted: {}", id);
+        }
+        return "IDs Deleted Successfully";
     }
 }

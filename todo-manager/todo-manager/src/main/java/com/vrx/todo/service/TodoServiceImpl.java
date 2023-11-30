@@ -51,4 +51,9 @@ public class TodoServiceImpl implements TodoService {
     public String deleteTodo(int id) {
         return jdbcDao.deleteTodo(id);
     }
+
+    @Override
+    public String deleteMultipleTodos(Integer[] todoIds) {
+        return jdbcDao.deleteMultipleTodos(todoIds);
+    }
 }
