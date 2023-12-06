@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -49,10 +51,7 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
     @Override
     public Todo saveTodo(Todo todo) {
         logger.info("Todo: {}", todo);
-        int rows = template.update(SAVE_TODO_QUERY,
-                todo.getId(), todo.getTitle(),
-                todo.getContent(), todo.getStatus(),
-                todo.getAddedDate(), todo.getTodoDate());
+        int rows = template.update(SAVE_TODO_QUERY, todo.getId(), todo.getTitle(), todo.getContent(), todo.getStatus(), todo.getAddedDate(), todo.getTodoDate());
         logger.info("Todo Created.");
         logger.info("Todo added rows: {}", rows);
         return todo;
@@ -60,21 +59,42 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
 
     @Override
     public Todo getTodo(int id) throws ParseException {
-        Map<String, Object> todoData = template.queryForMap(GET_TODO_QUERY, id);
-        logger.info("getTodo(): {}", todoData);
-        Todo todo = new Todo();
-        todo.setId((int) todoData.get("id"));
-        todo.setTitle((String) todoData.get("title"));
-        todo.setContent((String) todoData.get("content"));
-        todo.setStatus((String) todoData.get("status"));
-        todo.setAddedDate(TodoHelper.parseDate((LocalDateTime) todoData.get("addedDate")));
-        todo.setTodoDate(TodoHelper.parseDate((LocalDateTime) todoData.get("todoDate")));
-        return todo;
+//        -------Implementing Normal Way:  using queryForMap
+//        Map<String, Object> todoData = template.queryForMap(GET_TODO_QUERY, id);
+//        Todo todo = new Todo();
+//        todo.setId((int) todoData.get("id"));
+//        todo.setTitle((String) todoData.get("title"));
+//        todo.setContent((String) todoData.get("content"));
+//        todo.setStatus((String) todoData.get("status"));
+//        todo.setAddedDate(TodoHelper.parseDate((LocalDateTime) todoData.get("addedDate")));
+//        todo.setTodoDate(TodoHelper.parseDate((LocalDateTime) todoData.get("todoDate")));
+//        --------------------------------------------------------------
+//       -------Implementing RowMapper Below: using queryForObject--------
+//        return template.queryForObject(GET_TODO_QUERY, new TodoRowMapper(), id);
+//        --------------------------------------------------------------
+//        ------ Implementing Anonymous class below: using queryForObject ----------------------
+        return template.queryForObject(GET_TODO_QUERY, new RowMapper<Todo>() {
+            @Override
+            public Todo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Todo todo = new Todo();
+                todo.setId((int) rs.getInt("id"));
+                todo.setTitle((String) rs.getString("title"));
+                todo.setContent((String) rs.getString("content"));
+                todo.setStatus((String) rs.getString("status"));
+                try {
+                    todo.setAddedDate(TodoHelper.parseDate((LocalDateTime) rs.getObject("addedDate")));
+                    todo.setTodoDate(TodoHelper.parseDate((LocalDateTime) rs.getObject("todoDate")));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+                return todo;
+            }
+        });
     }
 
     @Override
     public List<Todo> getAllTodos() {
-        List<Map<String, Object>> todos = null;
+        /*List<Map<String, Object>> todos = null;
         todos = template.queryForList(GET_ALL_TODOS_QUERY);
         List<Todo> todosList = todos.stream().map(t -> {
             Todo todo = new Todo();
@@ -89,9 +109,27 @@ public class TodoJdbcDaoImpl implements TodoJdbcDao {
                 throw new RuntimeException(e);
             }
             return todo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList());*/
+        //------Implementing RowMapper below-------------
+        /*List<Todo> todos = template.query(GET_ALL_TODOS_QUERY, new TodoRowMapper());
         logger.info("getAllTodos(): {}", todos);
-        return todosList;
+        return todos;*/
+//        --------Implementing Lambda function----------------
+        List<Todo> todos = template.query(GET_ALL_TODOS_QUERY, (rs, rowNum) -> {
+            Todo todo = new Todo();
+            todo.setId((int) rs.getInt("id"));
+            todo.setTitle((String) rs.getString("title"));
+            todo.setContent((String) rs.getString("content"));
+            todo.setStatus((String) rs.getString("status"));
+            try {
+                todo.setAddedDate(TodoHelper.parseDate((LocalDateTime) rs.getObject("addedDate")));
+                todo.setTodoDate(TodoHelper.parseDate((LocalDateTime) rs.getObject("todoDate")));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            return todo;
+        });
+        return todos;
     }
 
     @Override
