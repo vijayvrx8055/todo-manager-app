@@ -1,17 +1,23 @@
 package com.vrx.todo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Component
+//@Component
+@Entity
+@Table(name = "TODO")
 public class Todo {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String title;
     private String content;
     private String status;
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date addedDate;
 
     @JsonFormat(pattern = "dd/MM/yyyy") //expected date format

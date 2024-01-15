@@ -24,6 +24,7 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<Todo> createTodo(@RequestBody Todo todo) {
         Todo savedTodo = todoService.createTodo(todo);
+        logger.info("Created TODO: {}", savedTodo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTodo);
     }
 
@@ -45,6 +46,7 @@ public class TodoController {
     @PutMapping("/{id}")
     public ResponseEntity<Todo> updateTodo(@RequestBody Todo todoWithNewDetails, @PathVariable("id") int id) {
         Todo updatedTodo = todoService.updateTodo(todoWithNewDetails, id);
+        logger.info("Updated TODO: {}", updatedTodo);
         return ResponseEntity.status(HttpStatus.OK).body(updatedTodo);
     }
 
